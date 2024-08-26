@@ -3,11 +3,14 @@ package main
 import (
 	"net/http"
 
+	"github.com/cauelz/golang-event-booking-rest-api/db"
 	"github.com/cauelz/golang-event-booking-rest-api/models"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+
+	db.InitDB()
 
 	server := gin.Default()
 
@@ -25,6 +28,7 @@ func getEvents(c *gin.Context) {
 }
 
 func createEvent(c *gin.Context) {
+
 	var event models.Event
 
 	err := c.ShouldBindBodyWithJSON(&event)
