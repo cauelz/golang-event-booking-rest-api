@@ -1,0 +1,10 @@
+PUT http://localhost:8080/events/1
+Content-Type: application/json
+
+{
+  "name": "Evento do Caue Legal",
+  "description": "New Event Description",
+  "location": "New Event Location",
+  "dateTime": "2022-12-31T23:59:59.999Z",
+  "user_id": 2
+}
