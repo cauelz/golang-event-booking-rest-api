@@ -1,6 +1,9 @@
 package models
 
-import "github.com/cauelz/golang-event-booking-rest-api/db"
+import (
+	"github.com/cauelz/golang-event-booking-rest-api/db"
+	"github.com/cauelz/golang-event-booking-rest-api/utils"
+)
 
 type User struct {
 	ID       int64  `json:"id"`
@@ -20,7 +23,13 @@ func (u User) Save() error {
 
 	defer stmt.Close()
 
-	result, error := stmt.Exec(u.Email, u.Password)
+	hashedPassword, error := utils.HashPassword(u.Password)
+
+	if error != nil {
+		return error
+	}
+	
+	result, error := stmt.Exec(u.Email, hashedPassword)
 
 	if error != nil {
 		return error
