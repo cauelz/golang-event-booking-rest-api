@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/cauelz/golang-event-booking-rest-api/db"
 	"github.com/cauelz/golang-event-booking-rest-api/utils"
 )
@@ -28,7 +30,7 @@ func (u User) Save() error {
 	if error != nil {
 		return error
 	}
-	
+
 	result, error := stmt.Exec(u.Email, hashedPassword)
 
 	if error != nil {
@@ -40,4 +42,26 @@ func (u User) Save() error {
 	u.ID = id
 
 	return error
+}
+
+func (u User) ValidateCredentials() error {
+	query := "SELECT password FROM users WHERE email = ?"
+
+	row := db.DB.QueryRow(query, u.Email)
+
+	var retrievedPassword string
+
+	error := row.Scan(&retrievedPassword)
+
+	if error != nil {
+		return errors.New("credentials invalid")
+	}
+
+	passwordIsValid := utils.CheckPasswordHash(u.Password, retrievedPassword)
+
+	if !passwordIsValid {
+		return errors.New("credentials invalid")
+	}
+
+	return nil
 }
