@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/cauelz/golang-event-booking-rest-api/models"
+	"github.com/cauelz/golang-event-booking-rest-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -46,5 +47,12 @@ func login (c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message" : "Login Successful!"})
+	jwtToken, error := utils.GenerateToken(user.Email, user.ID)
+
+	if error != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message" : "Login Successful!", "token": jwtToken})
 }
