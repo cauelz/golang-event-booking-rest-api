@@ -12,12 +12,10 @@ type Event struct {
 	Description string `json:"description" binding:"required"`
 	Location string `json:"location" binding:"required"`
 	DateTime time.Time `json:"dateTime" binding:"required"`
-	UserId int `json:"user_id"`
+	UserId int64 `json:"user_id"`
 }
 
-var events = []Event{}
-
-func (e Event) Save() error {
+func (e *Event) Save() error {
 
 	// query is a SQL query that inserts a new event into the events table.
 	// The query uses placeholders (?) to represent the values that will be inserted into the table. 
@@ -94,7 +92,7 @@ func GetEventById(id int64) (*Event, error) {
 
 }
 
-func (e Event) Update() error {
+func (e *Event) Update() error {
 	query := `
 		UPDATE events
 		SET name = ?, description = ?, location = ?, dateTime = ?, user_id = ?
