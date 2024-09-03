@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"errors"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -23,4 +24,38 @@ func GenerateToken(email string, userId int64) (string, error) {
 	// Sign and get the complete encoded token as a string using the secret key
 	// secret key means that the token will be signed using the HMAC-SHA algorithm with the secret key as the secret.
 	return jwtToken.SignedString([]byte(secretKey))
+}
+
+func VerifyToken(token string) error {
+
+	// Parse the token using the secret key
+	parsedToken, error := jwt.Parse(token, func(token *jwt.Token) (interface{}, error) {
+		
+		_, ok := token.Method.(*jwt.SigningMethodHMAC)
+
+		if !ok {
+			return nil, errors.New("Invalid signing method")
+		}
+
+		return []byte(secretKey), nil
+	})
+
+	if error != nil {
+		return errors.New("Could not verify token")
+	}
+
+	if !parsedToken.Valid {
+		return errors.New("Invalid token")
+	}
+
+	// claims, ok :=parsedToken.Claims.(jwt.MapClaims)
+
+	// if !ok {
+	// 	return errors.New("Could not parse claims")
+	// }
+
+	// email := claims["email"].(string)
+	// userId := claims["userId"].(float64)
+
+	return nil
 }

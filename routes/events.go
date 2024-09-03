@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/cauelz/golang-event-booking-rest-api/models"
+	"github.com/cauelz/golang-event-booking-rest-api/utils"
 	"github.com/gin-gonic/gin"
 )
 
@@ -41,6 +42,20 @@ func getEvent(c *gin.Context) {
 
 func createEvent(c *gin.Context) {
 
+	token := c.Request.Header.Get("Authorization")
+
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	error := utils.VerifyToken(token)
+
+	if error != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
 	var event models.Event
 
 	err := c.ShouldBindBodyWithJSON(&event)
@@ -50,7 +65,6 @@ func createEvent(c *gin.Context) {
 		return
 	}
 
-	event.ID = 1
 	event.UserId = 1
 
 	event.Save()
