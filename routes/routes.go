@@ -1,13 +1,22 @@
 package routes
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/cauelz/golang-event-booking-rest-api/middlewares"
+	"github.com/gin-gonic/gin"
+)
 
 func RegisterRoutes(server *gin.Engine) {
 	server.GET("/events", getEvents)
 	server.GET("/events/:id", getEvent)
-	server.POST("/events", createEvent)
-	server.PUT("/events/:id", updateEvent)
-	server.DELETE("/events/:id", deleteEvent)
+
+	// The POST, PUT, and DELETE routes are protected by the Authenticate middleware.
+	// Created a Group called / that uses the Authenticate middleware.
+	authenticated := server.Group("/")
+	authenticated.Use(middlewares.Authenticate)
+	authenticated.POST("/events", createEvent)
+	authenticated.PUT("/events/:id", updateEvent)
+	authenticated.DELETE("/events/:id", deleteEvent)
+
 	server.POST("/signup", signup)
 	server.POST("/login", login)
 }
