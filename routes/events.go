@@ -67,13 +67,19 @@ func updateEvent(c *gin.Context) {
 		return
 	}
 
-	_, error = models.GetEventById(id)
+	userId := c.GetInt64("userId")
+	event, error := models.GetEventById(id)
 
+	
 	if error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
 		return
 	}
-
+	
+	if userId != event.UserId {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You are not allowed to update this event"})
+		return
+	}
 	var updatedEvent models.Event
 
 	error = c.ShouldBindBodyWithJSON(&updatedEvent)
@@ -104,10 +110,17 @@ func deleteEvent(c *gin.Context) {
 		return
 	}
 
-	_, error = models.GetEventById(id)
+	userId := c.GetInt64("userId")
+	event, error := models.GetEventById(id)
 
+	
 	if error != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Event not found"})
+		return
+	}
+
+	if userId != event.UserId {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You are not allowed to delete this event"})
 		return
 	}
 
